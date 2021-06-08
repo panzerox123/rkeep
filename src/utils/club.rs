@@ -1,4 +1,5 @@
 use rusqlite::{params, Connection, Result};
+use std::fs;
 
 #[derive(Debug)]
 
@@ -8,7 +9,7 @@ pub struct Club {
     pub club_path: String,
 }
 
-fn open_connection() -> Connection {
+pub fn open_connection() -> Connection {
     let connection = Connection::open("./testdb");
     let connection = match connection {
         Ok(c) => c,
@@ -17,7 +18,7 @@ fn open_connection() -> Connection {
     return connection;
 }
 
-pub fn create_club(club_name: String, path: String) {
+pub fn create_club(club_name: String, path: &mut String) {
     let connection = open_connection();
     println!("clubname: {} ; path: {}", club_name, path);
     let new_club = Club {
@@ -45,8 +46,11 @@ pub fn create_club(club_name: String, path: String) {
         Ok(_) => {}
         Err(err) => {
             eprintln!("Failed to create Club : {}", err);
+            return;
         }
     };
+    let path = path.as_str();
+    fs::create_dir_all(path);
 }
 
 pub fn list_club() -> Vec<Club> {
